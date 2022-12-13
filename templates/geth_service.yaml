@@ -4,6 +4,8 @@ metadata:
   name: {{ .Values.geth.service.name }}
   labels:
     {{- include "eth-node.labels" . | nindent 4 }}
+  annotations:
+    {{- toYaml .Values.geth.service.annotations  | nindent 4 }}
 spec:
   type: {{ .Values.geth.service.type }}
   ports:
