@@ -1,0 +1,9 @@
+apiVersion: v2
+name: eth-node
+description: Ethereum node with Geth as execution layer client and Prysm as consensus layer client
+type: application
+version: 0.1.0
+appVersion: "v1.10.26"
+maintainers:
+  - name: "Benjamin Koltermann"
+    email: b.koltermann@avolens.com

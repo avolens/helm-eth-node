@@ -1,0 +1,73 @@
+geth:
+  deployment:
+    name: "geth"
+    replicas: 1
+    commandArgs: |
+      ["--datadir.ancient", "/data-ancient/", "--datadir", "/data/", "--http", "--http.addr", "0.0.0.0", "--goerli", "--authrpc.jwtsecret", "/secret/jwt.hex", "--authrpc.addr", "0.0.0.0", "--authrpc.vhosts", "*"]
+    image:
+      repository: ethereum/client-go
+      pullPolicy: Always
+      tag: "v1.10.26"
+    replicaCount: 1
+    podAnnotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+
+  service:
+    name: "geth"
+    type: ClusterIP
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "geth"
+
+  secret:
+    jwt: "<generate jwt secret>"
+
+prysm:
+  deployment:
+    name: "prysm"
+    replicas: 1
+    commandArgs: |
+      ["--execution-endpoint=http://geth.default.svc.cluster.local:8551", "--prater", "--jwt-secret=/secret/jwt.hex", "--accept-terms-of-use", "--datadir", "/data/", "--checkpoint-sync-url=https://goerli.beaconstate.info/", "--genesis-beacon-api-url=https://goerli.beaconstate.ethstaker.cc/"]
+    image:
+      repository: gcr.io/prysmaticlabs/prysm/beacon-chain
+      pullPolicy: Always
+      tag: "latest"
+    replicaCount: 1
+    podAnnotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+
+  service:
+    create: false
+    name: "prysm"
+    type: ClusterIP
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "prysm"

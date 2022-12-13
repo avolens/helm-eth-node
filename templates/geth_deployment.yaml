@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.geth.deployment.name }}
+  labels:
+    {{- include "eth-node.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.geth.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: "geth"
+  template:
+    metadata:
+      {{- with .Values.geth.deployment.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app: "geth"
+    spec:
+      {{- with .Values.geth.deployment.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ .Values.geth.serviceAccount.name }}
+      securityContext:
+        {{- toYaml .Values.geth.deployment.podSecurityContext | nindent 8 }}
+      volumes:
+      - name: jwt-secret
+        secret:
+          secretName: jwt-secret
+      - name: geth-data
+        hostPath:
+          path: "/data/geth"
+          type: Directory
+      - name: geth-data-ancient
+        hostPath:
+          path: "/data-ancient/"
+          type: Directory
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.geth.deployment.securityContext | nindent 12 }}
+          image: "{{ .Values.geth.deployment.image.repository }}:{{ .Values.geth.deployment.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.geth.deployment.image.pullPolicy }}
+          command: ["geth"]
+          args: {{ .Values.geth.deployment.commandArgs }}
+          ports:
+            - name: http-rpc
+              containerPort: 8545
+              protocol: TCP
+            - name: auth-port
+              containerPort: 8551
+              protocol: TCP
+          volumeMounts:
+          - name: jwt-secret
+            readOnly: true
+            mountPath: "/secret/"
+          - name : geth-data
+            mountPath: "/data/"
+          - name : geth-data-ancient
+            mountPath: "/data-ancient/"

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.prysm.deployment.name }}
+  labels:
+    {{- include "eth-node.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.prysm.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: "prysm"
+  template:
+    metadata:
+      {{- with .Values.prysm.deployment.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app: "prysm"
+    spec:
+      {{- with .Values.prysm.deployment.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ .Values.prysm.serviceAccount.name }}
+      securityContext:
+        {{- toYaml .Values.prysm.deployment.podSecurityContext | nindent 8 }}
+      volumes:
+      - name: jwt-secret
+        secret:
+          secretName: jwt-secret
+      - name: prysm-data
+        hostPath:
+          path: "/data/prysm"
+          type: Directory
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.prysm.deployment.securityContext | nindent 12 }}
+          image: "{{ .Values.prysm.deployment.image.repository }}:{{ .Values.prysm.deployment.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.prysm.deployment.image.pullPolicy }}
+          args: {{ .Values.prysm.deployment.commandArgs }}
+          volumeMounts:
+          - name: jwt-secret
+            readOnly: true
+            mountPath: "/secret/"
+          - name : prysm-data
+            mountPath: "/data/"
