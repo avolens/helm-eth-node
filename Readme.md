@@ -30,3 +30,4 @@ EDIT values.yaml as you need it!
 ```
 helm install -f values.yaml eth-node avolens/eth-node
 ```
+Use `--version` to use beta versions.

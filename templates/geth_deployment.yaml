@@ -45,7 +45,10 @@ spec:
           {{- end }}
           imagePullPolicy: {{ .Values.geth.deployment.image.pullPolicy }}
           command: ["geth"]
-          args: {{ .Values.geth.deployment.commandArgs }}
+          args:
+            {{- range .Values.geth.deployment.commandArgs }}
+            - {{ . | quote }}
+            {{- end }}
           ports:
             - name: http-rpc
               containerPort: 8545

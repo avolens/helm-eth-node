@@ -11,11 +11,11 @@ geth:
     commandArgs:
       - "--datadir"
       - "/data/"
+      - "--authrpc.jwtsecret"
+      - "/secret/jwt.hex"
       - "--http"
       - "--http.addr"
       - "0.0.0.0"
-      - "--authrpc.jwtsecret"
-      - "/secret/jwt.hex"
       - "--authrpc.addr"
       - "0.0.0.0"
       - "--authrpc.vhosts"
@@ -23,6 +23,11 @@ geth:
     podAnnotations: {}
     podSecurityContext: {}
     securityContext: {}
+    persistentVolume:
+      size: 400Gi
+      class: standard-rwo
+      annotations:
+        "helm.sh/resource-policy": keep
 
   service:
     name: "geth"
@@ -45,16 +50,18 @@ prysm:
       pullSecret: ""
     replicas: 1
     commandArgs:
-      - "--execution-endpoint=http://geth.default.svc.cluster.local:8551"
-      - "--jwt-secret=/secret/jwt.hex"
-      - "--accept-terms-of-use"
       - "--datadir"
       - "/data/"
-      - "--checkpoint-sync-url=https://goerli.beaconstate.info/"
-      - "--genesis-beacon-api-url=https://goerli.beaconstate.ethstaker.cc/"
+      - "--jwt-secret=/secret/jwt.hex"
+      - "--execution-endpoint=http://geth.default.svc.cluster.local:8551"
     podAnnotations: {}
     podSecurityContext: {}
     securityContext: {}
+    persistentVolume:
+      size: 400Gi
+      class: standard-rwo
+      annotations:
+        "helm.sh/resource-policy": keep
 
   serviceAccount:
     create: true

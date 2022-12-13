@@ -44,7 +44,10 @@ spec:
           image: "{{ .Values.prysm.deployment.image.repository }}:{{ .Values.prysm.deployment.image.tag | default "latest" }}"
           {{- end }}
           imagePullPolicy: {{ .Values.prysm.deployment.image.pullPolicy }}
-          args: {{ .Values.prysm.deployment.commandArgs }}
+          args:
+            {{- range .Values.prysm.deployment.commandArgs }}
+            - {{ . | quote }}
+            {{- end }}
           volumeMounts:
           - name: jwt-secret
             readOnly: true

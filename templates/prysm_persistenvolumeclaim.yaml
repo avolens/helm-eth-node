@@ -2,10 +2,14 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: prysm-pvc
+  {{- with .Values.prysm.deployment.persistentVolume.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 400Gi
-  storageClassName: standard-rwo
+      storage: {{ .Values.prysm.deployment.persistentVolume.size }}
+  storageClassName: {{ .Values.prysm.deployment.persistentVolume.class }}
