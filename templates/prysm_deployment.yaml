@@ -22,7 +22,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.prysm.serviceAccount.create }}
       serviceAccountName: {{ .Values.prysm.serviceAccount.name }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.prysm.deployment.podSecurityContext | nindent 8 }}
       volumes:
@@ -36,7 +38,11 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.prysm.deployment.securityContext | nindent 12 }}
-          image: "{{ .Values.prysm.deployment.image.repository }}:{{ .Values.prysm.deployment.image.tag | default .Chart.AppVersion }}"
+          {{- if .Values.prysm.deployment.image.digest }}
+          image: "{{ .Values.prysm.deployment.image.repository }}@{{ .Values.prysm.deployment.image.digest }}"
+          {{- else }}
+          image: "{{ .Values.prysm.deployment.image.repository }}:{{ .Values.prysm.deployment.image.tag | default "latest" }}"
+          {{- end }}
           imagePullPolicy: {{ .Values.prysm.deployment.image.pullPolicy }}
           args: {{ .Values.prysm.deployment.commandArgs }}
           volumeMounts:
