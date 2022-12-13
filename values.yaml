@@ -3,7 +3,7 @@ geth:
     name: "geth"
     replicas: 1
     commandArgs: |
-      ["--datadir.ancient", "/data-ancient/", "--datadir", "/data/", "--http", "--http.addr", "0.0.0.0", "--goerli", "--authrpc.jwtsecret", "/secret/jwt.hex", "--authrpc.addr", "0.0.0.0", "--authrpc.vhosts", "*"]
+      ["--datadir", "/data/", "--http", "--http.addr", "0.0.0.0", "--goerli", "--authrpc.jwtsecret", "/secret/jwt.hex", "--authrpc.addr", "0.0.0.0", "--authrpc.vhosts", "*"]
     image:
       repository: ethereum/client-go
       pullPolicy: Always
@@ -34,7 +34,7 @@ geth:
     name: "geth"
 
   secret:
-    jwt: "<generate jwt secret>"
+    jwt: "<generate jwt>"
 
 prysm:
   deployment:

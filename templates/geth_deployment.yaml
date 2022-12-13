@@ -30,13 +30,8 @@ spec:
         secret:
           secretName: jwt-secret
       - name: geth-data
-        hostPath:
-          path: "/data/geth"
-          type: Directory
-      - name: geth-data-ancient
-        hostPath:
-          path: "/data-ancient/"
-          type: Directory
+        persistentVolumeClaim:
+          claimName: geth-pvc
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -58,5 +53,3 @@ spec:
             mountPath: "/secret/"
           - name : geth-data
             mountPath: "/data/"
-          - name : geth-data-ancient
-            mountPath: "/data-ancient/"

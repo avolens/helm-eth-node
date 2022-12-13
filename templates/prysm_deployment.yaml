@@ -30,9 +30,8 @@ spec:
         secret:
           secretName: jwt-secret
       - name: prysm-data
-        hostPath:
-          path: "/data/prysm"
-          type: Directory
+        persistentVolumeClaim:
+          claimName: prysm-pvc
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
