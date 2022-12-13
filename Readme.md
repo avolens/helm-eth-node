@@ -18,3 +18,15 @@ See [here](https://docs.prylabs.network/docs/prysm-usage/parameters) for all com
 
 For faster sync you might want to use [checkpoint sync](https://docs.prylabs.network/docs/prysm-usage/checkpoint-sync).
 
+## Install instructions
+```
+helm repo add avolens 'https://raw.githubusercontent.com/avolens/helm/stable/releases/'
+helm repo update
+helm repo list
+helm show values avolens/eth-node > values.yaml
+```
+
+EDIT values.yaml as you need it!
+```
+helm install -f values.yaml eth-node avolens/eth-node
+```
