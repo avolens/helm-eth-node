@@ -40,3 +40,23 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+    Returns given number of random Hex characters.
+
+    In practice, it generates up to 100 randAlphaNum strings
+    that are filtered from non-hex characters and augmented
+    to the resulting string that is finally trimmed down.
+*/}}
+{{- define "eth-node.randHex" -}}
+    {{- $result := "" }}
+    {{- range $i := until 100 }}
+        {{- if lt (len $result) . }}
+            {{- $rand_list := randAlphaNum . | splitList "" -}}
+            {{- $reduced_list := without $rand_list "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" }}
+            {{- $rand_string := join "" $reduced_list }}
+            {{- $result = print $result $rand_string -}}
+        {{- end }}
+    {{- end }}
+    {{- $result | trunc . }}
+{{- end }}

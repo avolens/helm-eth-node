@@ -1,0 +1,17 @@
+{{- if .Values.geth.persistentVolume.create }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: geth-pvc
+  {{- with .Values.geth.persistentVolume.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.geth.persistentVolume.size }}
+  storageClassName: {{ .Values.geth.persistentVolume.class }}
+{{- end }}

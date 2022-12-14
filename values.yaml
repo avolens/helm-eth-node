@@ -1,0 +1,73 @@
+geth:
+  deployment:
+    name: "geth"
+    image:
+      repository: ethereum/client-go
+      pullPolicy: Always
+      tag: "v1.10.26"
+      digest: "sha256:63c6f90782bbfb20dd5b450c147448dae6725cf7d35eb24206ed162e1b252405"
+      pullSecret: ""
+    replicas: 1
+    commandArgs:
+      - "--datadir"
+      - "/data/"
+      - "--authrpc.jwtsecret"
+      - "/secret/jwt.hex"
+      - "--http"
+      - "--http.addr"
+      - "0.0.0.0"
+      - "--authrpc.addr"
+      - "0.0.0.0"
+      - "--authrpc.vhosts"
+      - "*"
+    podAnnotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+
+  persistentVolume:
+    create: true
+    size: 400Gi
+    class: standard-rwo
+    annotations:
+      "helm.sh/resource-policy": keep
+
+  service:
+    name: "geth"
+    type: ClusterIP
+    annotations: {}
+
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "geth"
+
+prysm:
+  deployment:
+    name: "prysm"
+    image:
+      repository: gcr.io/prysmaticlabs/prysm/beacon-chain
+      pullPolicy: Always
+      tag: "v3.1.2"
+      digest: "sha256:140aa344814fee97a5ef9ee873e69f4c851972b388588f74ea7d26b4842dc9c3"
+      pullSecret: ""
+    replicas: 1
+    commandArgs:
+      - "--datadir"
+      - "/data/"
+      - "--jwt-secret=/secret/jwt.hex"
+      - "--execution-endpoint=http://geth.default.svc.cluster.local:8551"
+    podAnnotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+
+  persistentVolume:
+    create: true
+    size: 400Gi
+    class: standard-rwo
+    annotations:
+      "helm.sh/resource-policy": keep
+
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: "prysm"

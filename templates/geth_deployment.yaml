@@ -22,29 +22,35 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.geth.serviceAccount.create }}
       serviceAccountName: {{ .Values.geth.serviceAccount.name }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.geth.deployment.podSecurityContext | nindent 8 }}
       volumes:
       - name: jwt-secret
         secret:
           secretName: jwt-secret
+      {{- if .Values.geth.persistentVolume.create }}
       - name: geth-data
-        hostPath:
-          path: "/data/geth"
-          type: Directory
-      - name: geth-data-ancient
-        hostPath:
-          path: "/data-ancient/"
-          type: Directory
+        persistentVolumeClaim:
+          claimName: geth-pvc
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.geth.deployment.securityContext | nindent 12 }}
-          image: "{{ .Values.geth.deployment.image.repository }}:{{ .Values.geth.deployment.image.tag | default .Chart.AppVersion }}"
+          {{- if .Values.geth.deployment.image.digest }}
+          image: "{{ .Values.geth.deployment.image.repository }}@{{ .Values.geth.deployment.image.digest }}"
+          {{- else }}
+          image: "{{ .Values.geth.deployment.image.repository }}:{{ .Values.geth.deployment.image.tag | default "latest" }}"
+          {{- end }}
           imagePullPolicy: {{ .Values.geth.deployment.image.pullPolicy }}
           command: ["geth"]
-          args: {{ .Values.geth.deployment.commandArgs }}
+          args:
+            {{- range .Values.geth.deployment.commandArgs }}
+            - {{ . | quote }}
+            {{- end }}
           ports:
             - name: http-rpc
               containerPort: 8545
@@ -56,7 +62,7 @@ spec:
           - name: jwt-secret
             readOnly: true
             mountPath: "/secret/"
+          {{- if .Values.geth.persistentVolume.create }}
           - name : geth-data
             mountPath: "/data/"
-          - name : geth-data-ancient
-            mountPath: "/data-ancient/"
+          {{- end}}
