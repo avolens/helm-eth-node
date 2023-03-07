@@ -8,6 +8,9 @@ metadata:
     {{- toYaml .Values.geth.service.annotations  | nindent 4 }}
 spec:
   type: {{ .Values.geth.service.type }}
+  {{- if eq .Values.geth.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.geth.service.loadBalancerIP }}
+  {{- end }}
   ports:
     - port: 8545
       targetPort: http-rpc
