@@ -56,6 +56,7 @@ prysm:
       - "/data/"
       - "--jwt-secret=/secret/jwt.hex"
       - "--execution-endpoint=http://geth.default.svc.cluster.local:8551"
+      - "--accept-terms-of-use"
     podAnnotations: {}
     podSecurityContext: {}
     securityContext: {}
